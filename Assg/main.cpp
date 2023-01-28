@@ -41,9 +41,10 @@ void registeruser(){
 	//check if username is in database
 	cin >> username;
 	string line;
-	fstream myfile;
+	ifstream myfile;
+	ofstream myfile2;
 
-	myfile.open("users.txt", ios::app);
+	myfile.open("users.txt");
 	if (!myfile)
 	{
 		cout << "Error" << endl;
@@ -63,18 +64,20 @@ void registeruser(){
 				available = false;
 				break;
 			}
+			cout << "Hello";
 
 			
 		}
 		if (available == true)
 		{
+			myfile2.open("users.txt", ios::app);
 			cout << "Username available. " << endl;
 			cout << "Input password:";
 			cin >> password;
 			string combined= username + "," + password + "\n";
-			myfile << combined;
+			myfile2 << combined;
 			
-			myfile.close();
+			myfile2.close();
 		}
 		else
 		{
