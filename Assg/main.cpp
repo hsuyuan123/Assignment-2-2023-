@@ -66,15 +66,16 @@ void registeruser(){
 
 			
 		}
+		myfile.close();
 		if (available == true)
 		{
 			myfile2.open("users.txt", ios::app);
 			cout << "Username available. " << endl;
-			cout << "Input password:";
+			cout << "Input password: ";
 			cin >> password;
 			string combined= username + "," + password + "\n";
 			myfile2 << combined;
-			cout << "Account created";
+			cout << "Account created"<<endl;
 			myfile2.close();
 		}
 		else
@@ -94,10 +95,72 @@ void registeruser(){
 	
 }
 
-void loginuser() {
+bool loginuser() {
+	string username;
+	string password;
 	string input;
+	string line;
+	ifstream myfile;
+	ofstream myfile2;
+	bool valid = false;
+
 	cout << "Input username:";
-	cin >> input;
+	//check if username is in database
+	cin >> username;
+	
+
+	myfile.open("users.txt");
+	if (!myfile)
+	{
+		cout << "Error" << endl;
+	}
+	else
+	{
+		while (getline(myfile, line))
+		{
+
+			string array[2];
+
+			split(line, array);
+			if (array[0] == username)
+			{
+				valid = true;
+				password = array[1];
+				break;
+			}
+
+
+		}
+		
+		while (valid==true)
+		{
+			
+	
+			cout << "Input password (0 to exit): ";
+			cin >> input;
+			if (input == password)
+			{
+				cout << "Welcome back, " + username << endl;
+				return true;
+			}
+			else if (input == "0")
+			{
+				return false;
+			}
+			else
+			{
+				cout << "Wrong password" << endl;
+			}
+		}
+		
+		
+		cout << "Username not in database" << endl;
+		
+		myfile.close();
+	}
+
+
+
 
 }
 
