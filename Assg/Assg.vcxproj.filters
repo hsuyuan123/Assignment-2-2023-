@@ -40,5 +40,8 @@
     <Text Include="post.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="users.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

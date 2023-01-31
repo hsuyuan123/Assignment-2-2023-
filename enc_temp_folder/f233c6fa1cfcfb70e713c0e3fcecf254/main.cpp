@@ -84,7 +84,13 @@ void registeruser(){
 		}
 		
 	}
-
+	
+		//// opening file using fstream
+		//f.open("Geeks for Geeks.txt");
+		//while (f >> word) {
+		//	cout << word << " ";
+		//}
+		//f.close();
 	
 	
 }
@@ -138,6 +144,7 @@ bool loginuser() {
 			}
 			else if (input == "0")
 			{
+				cout << " " << endl;
 				return false;
 			}
 			else
