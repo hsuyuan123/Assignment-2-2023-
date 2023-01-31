@@ -156,7 +156,8 @@ bool loginuser() {
 void createtopic() {
 	string topicname;
 	string topictext;
-	Topic topic1(topicname, topictext);
+	int topicid=0;
+	Topic topic1(topicid,topicname, topictext);
 	bool available = true;
 
 	string line;
@@ -169,45 +170,71 @@ void createtopic() {
 		cout << "Error" << endl;
 	}
 	myfile2.open("topic.txt", ios::app);
+	int topicid; //find id of last post
 	cout << "Input topic title:";
 	cin >> topicname;
 	cout << "Input topic content:";
 	cin >> topictext;
-	string combined = topicname + "," + topictext + "\n";
+	string combined = topicid + "," + topicname + "," + topictext + "\n";
 	myfile2 << combined;
 	cout << "Topic created.";
 	myfile2.close();
 
 }
-void displaytopics() {
-	string input;
-	cout << "TOPICS" << endl;
+Topic* loadtopic() {
 	string line;
 	ifstream topicfile("topic.txt");
+	static Topic topics[10] = {};
+	int counter = 0;
 	if (topicfile.is_open())
 	{
 		while (getline(topicfile, line))
 		{
 			//attempt to convert string from file into object
 			Topic topic1;
+			int index = 0;
 			stringstream s_stream(line); //create string stream from the string
 			while (s_stream.good()) {
+
 				string substr;
-				getline(s_stream, substr, ','); //get first string delimited by comma
-				cout << substr;
-				topic1.setTopicText(substr);
+				getline(s_stream, substr, ',');//get first string delimited by comma
+
+				//cout << substr;
+				if (index == 0) {
+
+					topic1.setTopicId(stoi(substr));
+				}
+				else if(index ==1) {
+					topic1.setTopicName(substr);
+				}
+				else if (index == 2) {
+					topic1.setTopicText(substr);
+				}
 				//topic1.getTopicName();
+				index++;
+				
 			}
+			cout << "" << endl;
+			topics[counter] = topic1;
+			counter++;
 		}
 		topicfile.close();
+		
 	}
-	//print all topic names, numbered from 1 to 5
-	cout << "7. Create new topic" << endl;
+	return topics;
+}
+void displaytopics(Topic *alltopic) {
+	string input;
+	cout << "TOPICS" << endl;
+	for (int i = 0; i < 3; i++) {
+		cout << i+1 << ". ";
+		cout << alltopic[i].getTopicName() << " ";
+		cout << alltopic[i].getTopicText() << endl;
+	}
+	cout << "Type new to Create new topic" << endl;
 	cout << "Input your choice:" << endl;
 	cin >> input;
-	//if input == 6, move to next page
-	//if input == 7, createtopic()
-	if (input == "7") {
+	if (input == "new") {
 		createtopic();
 	}
 }
@@ -216,35 +243,9 @@ void displayposts() {
 	//create
 }
 
-//void openfiles() {
-	////open file
-	//ofstream fw("topic.txt", std::ofstream::out);
-	////write into file
-	//if (fw.is_open())
-	//{
-	//	//store array contents to text file
-	//	for (int i = 0; i < sizeof(Topic); i++) {
-	//		fw << Topic[i] << "\n";
-	//	}
-	//	fw.close();
-	//}
-	//else cout << "Problem with opening file";
-	////read from file
-	//string line;
-	//ifstream myfile("topic.txt");
-	//if (myfile.is_open())
-	//{
-	//	while (getline(myfile, line))
-	//	{
-	//		cout << line << '\n';
-	//		vector<string> arr;
-	//		arr.push_back(line);
-	//	}
-	//	myfile.close();
-	//}
-//}
 
 int main(){
+	Topic* alltopic;
 	while (true){
 		int input;
 		cout << " " << endl;
@@ -262,7 +263,9 @@ int main(){
 			loginuser();
 		}
 		else if (input == 3) {
-			displaytopics();
+			alltopic = loadtopic();
+			//cout << alltopic[0].getTopicText() << endl;
+			displaytopics(alltopic);
 		}
 		else if (input == 4) {
 			break;

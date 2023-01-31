@@ -139,12 +139,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="postlist.h" />
     <ClInclude Include="topic.h" />
+    <ClInclude Include="topiclist.h" />
     <ClInclude Include="user.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="postlist.cpp" />
     <ClCompile Include="topic.cpp" />
+    <ClCompile Include="topiclist.cpp" />
     <ClCompile Include="user.cpp" />
   </ItemGroup>
   <ItemGroup>
