@@ -170,12 +170,11 @@ void createtopic() {
 		cout << "Error" << endl;
 	}
 	myfile2.open("topic.txt", ios::app);
-	int topicid; //find id of last post
 	cout << "Input topic title:";
 	cin >> topicname;
 	cout << "Input topic content:";
 	cin >> topictext;
-	string combined = topicid + "," + topicname + "," + topictext + "\n";
+	string combined = topicname + "," + topictext + "\n";
 	myfile2 << combined;
 	cout << "Topic created.";
 	myfile2.close();

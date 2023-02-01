@@ -21,7 +21,10 @@
     <ClInclude Include="topic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="List.h">
+    <ClInclude Include="topiclist.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="postlist.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,7 +38,10 @@
     <ClCompile Include="topic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="List.cpp">
+    <ClCompile Include="topiclist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="postlist.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,6 +50,9 @@
       <Filter>Resource Files</Filter>
     </Text>
     <Text Include="post.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="users.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>
