@@ -5,6 +5,7 @@
 #include <vector>
 #include "user.h"
 #include "topic.h"
+#include "List.h"
 using namespace std;
 
 void split(string str, string arr[2]) {
@@ -89,7 +90,7 @@ void registeruser(){
 	
 }
 
-bool loginuser() {
+string loginuser() {
 	string username;
 	string password;
 	string input;
@@ -126,6 +127,7 @@ bool loginuser() {
 
 
 		}
+		myfile.close();
 		
 		while (valid==true)
 		{
@@ -134,11 +136,11 @@ bool loginuser() {
 			if (input == password)
 			{
 				cout << "Welcome back, " + username << endl;
-				return true;
+				return username;
 			}
 			else if (input == "0")
 			{
-				return false;
+				return "";
 			}
 			else
 			{
@@ -147,8 +149,9 @@ bool loginuser() {
 		}
 		
 		cout << "Username not in database" << endl;
+		return "";
 		
-		myfile.close();
+
 	}
 
 }
@@ -170,7 +173,7 @@ void createtopic() {
 		cout << "Error" << endl;
 	}
 	myfile2.open("topic.txt", ios::app);
-	int topicid; //find id of last post
+	//int topicid; //find id of last post
 	cout << "Input topic title:";
 	cin >> topicname;
 	cout << "Input topic content:";
@@ -226,7 +229,7 @@ Topic* loadtopic() {
 void displaytopics(Topic *alltopic) {
 	string input;
 	cout << "TOPICS" << endl;
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i <3; i++) {
 		cout << i+1 << ". ";
 		cout << alltopic[i].getTopicName() << " ";
 		cout << alltopic[i].getTopicText() << endl;
@@ -242,34 +245,198 @@ void displaytopics(Topic *alltopic) {
 void displayposts() {
 	//create
 }
+void displayForums()
+{
+	string line;
+	ifstream myfile;
+	int counter = 0;
+	myfile.open("forum.txt");
+	if (!myfile)
+	{
+		cout << "Error" << endl;
+	}
+	else
+	{
 
+		while (getline(myfile, line))
+		{
+			cout << to_string(counter + 1) + ". " + line<<endl;
+			counter += 1;
+		}
+		myfile.close();
+	}
+}
+void createForums()
+{
+	string forumName;
+	bool available = true;
+	cout << "Input forum name:";
+	cin >> forumName;
+	string line;
+	ifstream myfile;
+	ofstream myfile2;
+	myfile.open("forum.txt");
+	if (!myfile)
+	{
+		cout << "Error" << endl;
+		ofstream myfile3("forum.txt");
+		myfile3.close();
+	}
+	else
+	{
+		while (getline(myfile, line))
+		{
+			string token;
+			stringstream s_stream(line);
+			while (getline(myfile, token, '\n'))
+			{
+				if (token == forumName)
+				{
+					available = false;
+				}
+			}
+		}
+		myfile.close();
+		if (available == true)
+		{
+			myfile2.open("forum.txt", ios::app);
+			cout << "Forum name available. " << endl;
+			string combined = forumName + "\n";
+			myfile2 << combined;
+			cout << "Forum created" << endl;
+			myfile2.close();
+		}
+		else
+		{
+			cout << "Please choose another forum name" << endl;
+		}
+
+	}
+}
+string chooseForum(int choice, List forumList)
+{
+	string line;
+	ifstream myfile;
+	int counter = 0;
+	myfile.open(forumList.get(choice - 1) + ".txt");
+	if (!myfile)
+	{
+		cout << "Error" << endl;
+	}
+	else
+	{
+		while (getline(myfile, line))
+		{
+			cout << counter + 1 + ". " + line;
+		}
+		myfile.close();
+	}
+	return forumList.get(choice - 1)+".txt";
+}
+
+void init()// Make sure files exist so there is no error
+{
+	string line;
+	ifstream myfile;
+	string variableArray[] = {"forum","topic","users"};
+	for (int i = 0; i > sizeof(variableArray) / sizeof(variableArray[0]); i++)
+	{
+		myfile.open(variableArray[i]);
+		if (!myfile)
+		{
+			
+			ofstream myfile2(variableArray[i]+".txt");
+			myfile2.close();
+		}
+		myfile.close();
+		
+	}
+	
+
+
+
+}
+void displayMenuNoLogin() //When not logged in
+{
+	cout << " " << endl;
+	cout << "1.Register" << endl;
+	cout << "2.Login" << endl;
+	cout << "3.View Topics" << endl;
+	cout << "4.Exit" << endl;
+	cout << "What would you like to do: ";
+}
+void displayMenuLogin() //When logged in
+{
+
+}
 
 int main(){
+	displayForums();
 	Topic* alltopic;
+	init();
+	string username="";
+	List forumList;
+	List topicList;
+	//Initiate forums into a list
+	string line;
+	ifstream myfile;
+	myfile.open("forum.txt");
+	if (!myfile)
+	{
+		cout << "Error" << endl;
+	}
+	else
+	{
+		while (getline(myfile, line))
+		{
+			forumList.add(line);
+		}
+		myfile.close();
+	}
 	while (true){
 		int input;
-		cout << " " << endl;
-		cout << "1.Register" << endl;
-		cout << "2.Login" << endl;
-		cout << "3.View Topics" << endl;
-		cout << "4.Exit" << endl;
-		cout << "What would you like to do:";
-		cin >> input;
-		cout << " " << endl;
-		if (input == 1) {
-			registeruser();
+		if (username != "") //Logged in
+		{
+			displayMenuLogin();
+			cin >> input;
+			cout << " " << endl;
+			if (input == 1) {
+				registeruser();
+			}
+			else if (input == 2) {
+				string username = loginuser();
+			}
+			else if (input == 3) {
+				alltopic = loadtopic();
+				//cout << alltopic[0].getTopicText() << endl;
+				displaytopics(alltopic);
+			}
+			else if (input == 4) {
+				break;
+			}
 		}
-		else if (input == 2) {
-			loginuser();
+		else //Not logged in
+		{
+			displayMenuNoLogin();
+			cin >> input;
+			cout << " " << endl;
+			if (input == 1) {
+				registeruser();
+			}
+			else if (input == 2) {
+				string username = loginuser();
+			}
+			else if (input == 3) {
+				alltopic = loadtopic();
+				//cout << alltopic[0].getTopicText() << endl;
+				displaytopics(alltopic);
+			}
+			else if (input == 4) {
+				break;
+			}
 		}
-		else if (input == 3) {
-			alltopic = loadtopic();
-			//cout << alltopic[0].getTopicText() << endl;
-			displaytopics(alltopic);
-		}
-		else if (input == 4) {
-			break;
-		}
+		
+		
 	}
 }
 
