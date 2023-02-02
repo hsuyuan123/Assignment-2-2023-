@@ -333,6 +333,26 @@ string chooseForum(int choice, List forumList)
 	}
 	return forumList.get(choice - 1)+".txt";
 }
+string chooseTopic(int choice, List topicList)
+{
+	string line;
+	ifstream myfile;
+	int counter = 0;
+	myfile.open(topicList.get(choice - 1) + ".txt");
+	if (!myfile)
+	{
+		cout << "Error" << endl;
+	}
+	else
+	{
+		while (getline(myfile, line))
+		{
+			cout << counter + 1 + ". " + line;
+		}
+		myfile.close();
+	}
+	return topicList.get(choice - 1) + ".txt";
+}
 
 void init()// Make sure files exist so there is no error
 {
