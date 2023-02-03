@@ -155,7 +155,7 @@ void List::print()
 
 	// Traverse the list.
 	while (temp != NULL) {
-		cout << temp->item << " ";
+		cout << temp->item << endl;
 		temp = temp->next;
 	}
 	cout << endl;

@@ -140,21 +140,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="List.h" />
-    <ClInclude Include="postlist.h" />
     <ClInclude Include="topic.h" />
-    <ClInclude Include="topiclist.h" />
     <ClInclude Include="user.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="List.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="postlist.cpp" />
     <ClCompile Include="topic.cpp" />
-    <ClCompile Include="topiclist.cpp" />
     <ClCompile Include="user.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="post.txt" />
     <Text Include="topic.txt" />
     <Text Include="users.txt" />
   </ItemGroup>
