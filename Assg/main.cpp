@@ -9,20 +9,40 @@
 //#include "topic.h"
 using namespace std;
 
-
+string* split(string str, char del) {
+	// declaring temp string to store the curr "word" upto del
+	string temp = "";
+	static string tempArray[5];
+	int counter = 0;
+	for (int i = 0; i < (int)str.size(); i++) {
+		// If cur char is not del, then append it to the cur "word", otherwise
+		  // you have completed the word, print it, and start a new word.
+		if (str[i] != del) {
+			temp += str[i];
+		}
+		else {
+			if (str[i] != '\n')
+			{
+				tempArray[counter] = temp;
+				temp = "";
+				counter++;
+			}
+			
+		}
+	}
+	tempArray[counter] = temp;
+	return tempArray;
+}
 void registeruser(){
-
 	string username;
 	string password;
 	bool available=true;
-
 	cout << "Input username:";
 	//check if username is in database
 	cin >> username;
 	string line;
 	ifstream myfile;
 	ofstream myfile2;
-
 	myfile.open("users.txt");
 	if (!myfile)
 	{
@@ -32,44 +52,12 @@ void registeruser(){
 	{
 		while (getline(myfile, line))
 		{
-
-			/*string array[2];
-
-			split(line, array);
-			if (array[0] == username)
+			string* array = split(line, ',');
+			if (username == array[0])
 			{
 				available = false;
 				break;
-			}*/
-			int index = 0;
-			stringstream s_stream(line); //create string stream from the string
-			while (s_stream.good()) {
-
-				string substr;
-				getline(s_stream, substr, ',');//get first string delimited by comma
-
-				//cout << substr;
-				if (index == 0) {
-
-					if (username == substr)
-					{
-						available = false;
-						break;
-					}
-					break;
-				}
-				/*else if(index ==1) {
-					if (password == substr)
-					{
-						available = false;
-						break;
-					}
-				}
-				index++;*/
 			}
-
-
-			
 		}
 		myfile.close();
 		if (available == true)
@@ -87,11 +75,7 @@ void registeruser(){
 		{
 			cout << "Please choose another username" << endl;
 		}
-		
 	}
-
-	
-	
 }
 
 string loginuser() {
@@ -102,13 +86,9 @@ string loginuser() {
 	ifstream myfile;
 	ofstream myfile2;
 	bool valid = false;
-
 	cout << "Input username: ";
-
 	//check if username is in database
 	cin >> username;
-	
-
 	myfile.open("users.txt");
 	if (!myfile)
 	{
@@ -118,46 +98,16 @@ string loginuser() {
 	{
 		while (getline(myfile, line))
 		{
-
-			/*string array[2];
-
-			split(line, array);
+			string* array=split(line,',');
 			if (array[0] == username)
 			{
 				valid = true;
 				password = array[1];
+				
 				break;
-			}*/
-			int index = 0;
-			stringstream s_stream(line); //create string stream from the string
-			while (s_stream.good()) {
-
-				string substr;
-				getline(s_stream, substr, ',');//get first string delimited by comma
-
-				//cout << substr;
-				if (index == 0) {
-
-					if (username == substr)
-					{
-						valid = true;
-						
-					}
-				}
-				else if(index ==1) {
-					password = substr;
-					if (valid==true)
-					{
-						
-						break;
-					}
-				}
-				index++;
 			}
-
 		}
 		myfile.close();
-		
 		while (valid==true)
 		{
 			cout << "Input password (0 to exit): ";
@@ -316,36 +266,15 @@ List topicContent(string fileName)
 	cout << fileName << endl << "------------------------------------" << endl;
 	while (getline(myfile, line))
 	{
-			
-		int index = 0;
-		stringstream s_stream(line); //create string stream from the string
-
-		while (s_stream.good()) {
-			
-			string substr;
-			getline(s_stream, substr, ',');
-			
-			//cout << substr;
-			if (index == 0) {
-			
-				content = substr;
-			}
-			else if(index ==1) {
-				name = substr;
-			}
-			/*else if (index == 2) {
-
-			}*/
-			index++;
-							
-		}
-		
-		
-
-		cout << counter+1<<". "<<content << ", by " << name << endl;
+		string* array = split(line, ',');
+		name = array[1];
+		content = array[0];
+		cout << counter + 1 << ". " << content << ", by " << name << endl;
 		counter++;
 		topicContent.add(line);
 	}
+		
+	
 	myfile.close();
 	return topicContent;
 }
@@ -363,52 +292,19 @@ string postContent(string fileName) //Return owner
 		ofstream myfile2(fileName + ".txt");
 		myfile2.close();
 	}
-	int index = 0;
-	stringstream s_stream(fileName);
-	while (s_stream.good()) {
 
-		string substr;
-		getline(s_stream, substr, ','); 
-		//cout << substr;
+	string* array = split(fileName, ',');
+	name = array[1];
+	username = array[2];
 
-		if (index == 1) {
-
-			name = substr;
-		}
-		else if (index == 2) {
-
-			username = substr;
-		}
-		index++;
-	}
 	
 	cout << name << endl << "------------------------------------" << endl;
 	while (getline(myfile, line))
 	{
 
-		int index = 0;
-		stringstream s_stream(line); //create string stream from the string
-
-		while (s_stream.good()) {
-
-			string substr;
-			getline(s_stream, substr, '`'); //Delimiter is `
-
-			//cout << substr;
-			if (index == 0) {
-
-				name = substr;
-			}
-			else if (index == 1) {
-				content = substr;
-			}
-			/*else if (index == 2) {
-
-			}*/
-			index++;
-
-		}
-
+		string* array = split(line, '`');
+		name = array[0];
+		content = array[1];
 
 		cout <<counter+1<<". "+ name << ": " << content << endl;
 		counter++;
