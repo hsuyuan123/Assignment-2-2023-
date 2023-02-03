@@ -225,6 +225,7 @@ Topic* loadtopic() {
 		
 	}
 	return topics;
+
 }
 void displaytopics(Topic *alltopic) {
 	string input;
@@ -313,26 +314,6 @@ void createForums()
 
 	}
 }
-string chooseForum(int choice, List forumList)
-{
-	string line;
-	ifstream myfile;
-	int counter = 0;
-	myfile.open(forumList.get(choice - 1) + ".txt");
-	if (!myfile)
-	{
-		cout << "Error" << endl;
-	}
-	else
-	{
-		while (getline(myfile, line))
-		{
-			cout << counter + 1 + ". " + line;
-		}
-		myfile.close();
-	}
-	return forumList.get(choice - 1)+".txt";
-}
 string chooseTopic(int choice, List topicList)
 {
 	string line;
@@ -379,40 +360,33 @@ void init()// Make sure files exist so there is no error
 void displayMenuNoLogin() //When not logged in
 {
 	cout << " " << endl;
-	cout << "1.Register" << endl;
-	cout << "2.Login" << endl;
-	cout << "3.View Topics" << endl;
-	cout << "4.Exit" << endl;
-	cout << "What would you like to do: ";
+
+	cout << "1. View Topics" << endl;
+	cout << "2. Register" << endl;
+	cout << "3. Login" << endl;
+	cout << "0. Exit" << endl;
+	cout << "What would you like to do?: ";
 }
 void displayMenuLogin() //When logged in
 {
+	cout << " " << endl;
 
+	cout << "1. View Topics" << endl;
+	cout << "2. Topics you visited" << endl;
+	cout << "3. Logout" << endl;
+	cout << "0. Exit" << endl;
+	cout << "What would you like to do: ";
 }
 
 int main(){
-	displayForums();
 	Topic* alltopic;
 	init();
 	string username="";
-	List forumList;
 	List topicList;
 	//Initiate forums into a list
 	string line;
 	ifstream myfile;
 	myfile.open("forum.txt");
-	if (!myfile)
-	{
-		cout << "Error" << endl;
-	}
-	else
-	{
-		while (getline(myfile, line))
-		{
-			forumList.add(line);
-		}
-		myfile.close();
-	}
 	while (true){
 		int input;
 		if (username != "") //Logged in
@@ -420,39 +394,47 @@ int main(){
 			displayMenuLogin();
 			cin >> input;
 			cout << " " << endl;
-			if (input == 1) {
-				registeruser();
+			if (input == 0)
+			{
+				cout << "Goodbye!" << endl;
+				break;
 			}
-			else if (input == 2) {
-				string username = loginuser();
-			}
-			else if (input == 3) {
+			else if (input == 1) {
 				alltopic = loadtopic();
 				//cout << alltopic[0].getTopicText() << endl;
 				displaytopics(alltopic);
+				
 			}
-			else if (input == 4) {
-				break;
+			else if (input == 2) {
+				//Put new things here
 			}
+			else if (input == 3) {
+				string username = loginuser();
+			}
+			
 		}
 		else //Not logged in
 		{
 			displayMenuNoLogin();
 			cin >> input;
 			cout << " " << endl;
-			if (input == 1) {
-				registeruser();
+			if (input == 0)
+			{
+				cout << "Goodbye!" << endl;
+				break;
 			}
-			else if (input == 2) {
-				string username = loginuser();
-			}
-			else if (input == 3) {
+			else if (input == 1) {
 				alltopic = loadtopic();
 				//cout << alltopic[0].getTopicText() << endl;
 				displaytopics(alltopic);
+
 			}
-			else if (input == 4) {
-				break;
+			else if (input == 2) {
+				registeruser();
+			}
+			else if (input == 3) {
+				string username = "";
+				cout << "You have logged out. ";
 			}
 		}
 		
