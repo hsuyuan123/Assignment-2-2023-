@@ -336,10 +336,15 @@ void replyPost(string fileName,string username,List postList)
 	cout << "Replying: ";
 	cin.ignore();
 	getline(cin, reply);
-	string combined = to_string(postList.getLength()+1)+"`"+username + "`" + reply + "\n";
-	myfile2 << combined;
-	cout << "Reply sent" << endl;
-	myfile2.close();
+	if (reply != "0")
+	{
+		cout << endl;
+		string combined = to_string(postList.getLength() + 1) + "`" + username + "`" + reply + "\n";
+		myfile2 << combined;
+		cout << "Reply sent" << endl << endl;
+		myfile2.close();
+	}
+	
 }
 
 void editReply(string fileName, string username, List postList)
@@ -360,6 +365,7 @@ void editReply(string fileName, string username, List postList)
 	cout << "Choose reply to edit: ";
 	string choice;
 	cin >> choice;
+	cout << endl;
 	string* array=split(postList.get(stoi(choice)-1),'`');
 	if (array[1] == username) //Author
 	{
@@ -367,6 +373,7 @@ void editReply(string fileName, string username, List postList)
 		string editedReply;
 		cin.ignore();
 		getline(cin, editedReply);
+		cout << endl;
 		postList.remove(stoi(choice)-1);
 		string combined= array[0] + "`"  + username + "`" +editedReply+"\n";
 		if (stoi(choice) == postList.getLength()+1)
@@ -390,7 +397,7 @@ void editReply(string fileName, string username, List postList)
 			myfile2 << postList.get(i);
 		
 		}
-		cout << "Reply edited" << endl;
+		cout << "Reply edited" << endl << endl;;
 		myfile2.close();
 	}
 	else //Not author
@@ -507,7 +514,6 @@ string editPost(string fileName, string username, List postList,List topicConten
 			{
 				
 				string* array = split(fileName, '`');
-				cout << fileName << endl;
 				myfile.open(array[0] + ".txt");
 				int i = 0;
 				while (getline(myfile, line))
@@ -563,62 +569,7 @@ string editPost(string fileName, string username, List postList,List topicConten
 	return fileName;
 }
 
-//List changeTopicContent(string fileName,string newFileName,string oldFileName)
-//{
-//	string line;
-//	ifstream myfile;
-//	string name;
-//	string content;
-//	List topicContent;
-//	int counter = 0;
-//	myfile.open(fileName + ".txt");
-//	if (!myfile)
-//	{
-//		ofstream myfile2(fileName + ".txt");
-//		myfile2.close();
-//	}
-//	string* array = split(oldFileName, '`'); //FileNames
-//	string oldName = array[1];
-//	array = split(newFileName, '`'); //FileNames
-//	string newName = array[1];
-//	string topicName = array[0];
-//	myfile.open(topicName + ".txt");
-//	if (!myfile)
-//	{
-//		ofstream myfile2(topicName + ".txt");
-//		while (getline(myfile, line))
-//		{
-//			array = split(line, '`');
-//			content = array[0];
-//			name = array[1];
-//
-//			if (content == oldName)
-//			{
-//				line = newName + "`" + name;
-//
-//			}
-//			topicContent.add(line);
-//		}
-//		myfile2.close();
-//	}
-//	while (getline(myfile, line))
-//	{
-//		array = split(line, '`');
-//		content = array[0];
-//		name = array[1];
-//		
-//		if (content==oldName)
-//		{
-//			line = newName + "`" + name;
-//			
-//		}
-//		topicContent.add(line);
-//	}
-//
-//
-//	myfile.close();
-//	return topicContent;
-//}
+
 
 void init()// Make sure files exist so there is no error
 {
@@ -680,7 +631,6 @@ void displayReplyMenu(int i)
 	
 }
 
-
 int main(){
 	/*Topic* alltopic;*/
 	init();
@@ -695,7 +645,7 @@ int main(){
 	while (true){
 		try
 		{
-			string input="Hello";
+			string input = "Hello";
 			if (username != "") //Logged in
 			{
 				displayMenuLogin();
@@ -708,90 +658,109 @@ int main(){
 				}
 				else if (input == "1") //View Topics
 				{
-					//alltopic = loadtopic();
-					////cout << alltopic[0].getTopicText() << endl;
-					//displaytopics(alltopic);
-					topicList = displayTopics();
-					string choice;
-					cout << "Topic to visit(0 to exit): ";
-					cin >> choice;
-					cout << endl;
-					if (choice == "0")
+					while (true)
 					{
-						continue;
-					}
-					else
-					{
-						string topic = topicList.get(stoi(choice) - 1);
-						topicContentList = topicContent(topic);
-						cout << "Post to visit(0 to exit): ";
-						cin >> choice;
-						cout << endl;
-						if (choice == "0")
-						{
-							continue;
-						}
-						else
-						{
-							string post = topicContentList.get(stoi(choice) - 1);
-							string fileName = topic + "`" + post;
-							postList = postContent(fileName);
-							string* array = split(fileName, '`');
-							string owner = array[2];
+						try {
+							topicList = displayTopics();
+							string listChoice="";
+							cout << "Topic to visit(0 to exit): ";
+							cin >> listChoice;
 							cout << endl;
+							if (listChoice == "0")
+							{
+								break;
+							}
 							while (true)
 							{
-								if (username != owner)
-								{
-									displayReplyMenu(1);
-								}
-								else
-								{
-									displayReplyMenu(0);
-								}
+								string choice;
+								string topic = topicList.get(stoi(listChoice) - 1);
+								topicContentList = topicContent(topic);
+								cout << "Post to visit(0 to exit): ";
 								cin >> choice;
 								cout << endl;
 								if (choice == "0")
 								{
 									break;
 								}
-								else if (choice == "1") //Reply
-								{
-									replyPost(fileName, username, postList);
-									break;
-
-								}
-								else if (choice == "2") //Edit Reply
-								{
-									editReply(fileName, username, postList);
-									break;
-								}
-								else if (choice == "3") //Delete Reply
-								{
-									deleteReply(fileName, username, postList);
-									break;
-								}
-								else if (choice == "4" && username == owner) //Edit post
-								{
-									string newFileName=editPost(fileName, username, postList,topicContentList);
-
-									break;
-								}
-								else if (choice == "5" && username == owner) //Delete post
-								{
-									int status=deletePost(fileName);
-									fileName = " ";
-									break;
-								}
 								else
 								{
-									cout << "Give a proper input" << endl;
+									string post = topicContentList.get(stoi(choice) - 1);
+									string fileName = topic + "`" + post;
+									postList = postContent(fileName);
+									string* array = split(fileName, '`');
+									string owner = array[2];
+									cout << endl;
+									while (true)
+									{
+										try
+										{
+											if (username != owner)
+											{
+												displayReplyMenu(1);
+											}
+											else
+											{
+												displayReplyMenu(0);
+											}
+											cin >> choice;
+											cout << endl;
+											if (choice == "0")
+											{
+												break;
+											}
+											else if (choice == "1") //Reply
+											{
+												replyPost(fileName, username, postList);
+												break;
+
+											}
+											else if (choice == "2") //Edit Reply
+											{
+												editReply(fileName, username, postList);
+												break;
+											}
+											else if (choice == "3") //Delete Reply
+											{
+												deleteReply(fileName, username, postList);
+												break;
+											}
+											else if (choice == "4" && username == owner) //Edit post
+											{
+												string newFileName = editPost(fileName, username, postList, topicContentList);
+
+												break;
+											}
+											else if (choice == "5" && username == owner) //Delete post
+											{
+												int status = deletePost(fileName);
+												fileName = " ";
+												break;
+											}
+											else
+											{
+												cout << "Give a proper input" << endl;
+											}
+										}
+										catch (exception)
+										{
+											cout << "Give a proper input" << endl << endl;
+										}
+									}
+
+
 								}
 							}
 
-
+							}
+						
+						catch (exception)
+						{
+							cout << "Give a proper input" << endl << endl;
 						}
+						
+						
 					}
+
 
 				}
 				else if (input == "2") // Topics you visited
@@ -844,11 +813,13 @@ int main(){
 		}
 		catch (exception)
 		{
-			cout << "Give a proper input" << endl;
+			cout << "Give a proper input" << endl<<endl;
 		}
-		
-		
 	}
+		
+		
+		
+	
 }
 
 
