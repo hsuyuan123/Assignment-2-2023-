@@ -278,7 +278,7 @@ List topicContent(string fileName)
 	myfile.close();
 	return topicContent;
 }
-string postContent(string fileName) //Return owner
+List postContent(string fileName)
 {
 	string line;
 	ifstream myfile;
@@ -286,6 +286,7 @@ string postContent(string fileName) //Return owner
 	string username;
 	string content;
 	int counter = 0;
+	List postList;
 	myfile.open(fileName + ".txt");
 	if (!myfile)
 	{
@@ -301,18 +302,22 @@ string postContent(string fileName) //Return owner
 	cout << name << endl << "------------------------------------" << endl;
 	while (getline(myfile, line))
 	{
-
+		
 		string* array = split(line, '`');
-		name = array[0];
-		content = array[1];
-
-		cout <<counter+1<<". "+ name << ": " << content << endl;
+		name = array[1];
+		content = array[2];
+		string combined = to_string(counter + 1) + "`" + name + "`" + content + "\n";
+		cout << counter + 1 << ". " + name << ": " << content << endl;
+		postList.add(combined);
+			
+		
 		counter++;
+		
 	}
 	myfile.close();
-	return username;
+	return postList;
 }
-void replyPost(string fileName,string username)
+void replyPost(string fileName,string username,List postList)
 {
 	string line;
 	ifstream myfile;
@@ -330,59 +335,99 @@ void replyPost(string fileName,string username)
 	cout << "Replying: ";
 	cin.ignore();
 	getline(cin, reply);
-	string combined = username + "`" + reply + "\n";
+	string combined = to_string(postList.getLength()+1)+"`"+username + "`" + reply + "\n";
 	myfile2 << combined;
 	cout << "Reply sent" << endl;
 	myfile2.close();
 }
-void deleteReply(string fileName, string username)
+void editReply(string fileName, string username, List postList)
 {
-//	string line;
-//	ifstream myfile;
-//	string name;
-//	string content;
-//	bool valid = false;
-//	myfile.open(fileName + ".txt");
-//	if (!myfile)
-//	{
-//		ofstream myfile2(fileName + ".txt");
-//		myfile2.close();
-//	}
-//	while (getline(myfile, line))
-//	{
-//		int index = 0;
-//		stringstream s_stream(line); //create string stream from the string
-//		while (s_stream.good()) {
-//			string substr;
-//			getline(s_stream, substr, ',');//get first string delimited by comma
-//			//cout << substr;
-//			if (index == 0) {
-//
-//				if (username == substr)
-//				{
-//					valid = true;
-//					break;
-//
-//				}
-//			}
-//			
-//					
-//++;
-//		}
-//
-//	}
-//	myfile.close();
-//	ofstream myfile2;
-//	myfile2.open(fileName + ".txt", ios::app);
-//	string reply;
-//	cout << "Number to delete: ";
-//	cin.ignore();
-//	getline(cin, reply);
-//	if (stoi(reply)
-//	string combined = username + "`" + reply + "\n";
-//	myfile2 << combined;
-//	cout << "Reply sent" << endl;
-//	myfile2.close();
+	string line;
+	ifstream myfile;
+	string name;
+	string content;
+	myfile.open(fileName + ".txt");
+	if (!myfile)
+	{
+		ofstream myfile2(fileName + ".txt");
+		myfile2.close();
+	}
+	myfile.close();
+	
+	string reply;
+	cout << "Choose reply to edit: ";
+	int choice;
+	cin >> choice;
+	string* array=split(postList.get(choice),'`');
+	if (array[1] == username) //Author
+	{
+		cout << "Edited reply: ";
+		string editedReply;
+		cin >> editedReply;
+		postList.remove(choice);
+		string combined= array[0] + "`" + editedReply + "`" + username;
+		postList.add(choice, combined);
+		ofstream myfile2;
+		myfile2.open(fileName + ".txt");
+		for (int i = 0; postList.getLength(); i++)
+		{
+			myfile2 << postList.get(i);
+		}
+		cout << "Reply edited" << endl;
+		myfile2.close();
+	}
+	else //Not author
+	{
+		cout << "You are not the author of this reply." << endl;
+	}
+
+	
+	
+	
+}
+void deleteReply(string fileName, string username, List postList)
+{
+	string line;
+	ifstream myfile;
+	string name;
+	string content;
+	myfile.open(fileName + ".txt");
+	if (!myfile)
+	{
+		ofstream myfile2(fileName + ".txt");
+		myfile2.close();
+	}
+	myfile.close();
+
+	string reply;
+	cout << "Choose reply to delete: ";
+	int choice;
+	cin >> choice;
+	string* array = split(postList.get(choice), '`');
+	if (array[1] == username) //Author
+	{
+		if (choice != 0)
+		{
+			postList.remove(choice);
+			ofstream myfile2;
+			myfile2.open(fileName + ".txt");
+			for (int i = 0; postList.getLength(); i++)
+			{
+				myfile2 << postList.get(i);
+			}
+			
+			myfile2.close();
+		}
+		
+	}
+	else //Not author
+	{
+		cout << "You are not the author of this reply." << endl;
+	}
+
+
+
+
 }
 void init()// Make sure files exist so there is no error
 {
@@ -447,6 +492,7 @@ int main(){
 	//Topic topicList;
 	List topicList;
 	List topicContentList;
+	List postList;
 	//Initiate topics into a list
 	//string line;
 	//ifstream myfile;
@@ -490,7 +536,9 @@ int main(){
 					else
 					{
 						string post = topicContentList.get(choice - 1);
-						string owner=postContent(topic + ","+post);
+						postList=postContent(topic + ","+post);
+						string* array = split(topic + "," + post, ',');
+						string owner = array[2];
 						cout << endl;
 						while (true)
 						{
@@ -510,17 +558,17 @@ int main(){
 							}
 							else if (choice == 1) //Reply
 							{
-								replyPost(topic + "," + post,username);
+								replyPost(topic + "," + post,username,postList);
 								break;
 								
 							}
 							else if (choice == 2) //Edit Reply
 							{
-								
+								editReply(topic + "," + post, username, postList);
 							}
 							else if (choice == 3) //Delete Reply
 							{
-								//deleteReply();
+								deleteReply(topic + "," + post, username, postList);
 							}
 							else if (choice == 4&&username==owner) //Delete post
 							{
