@@ -694,52 +694,62 @@ int main(){
 									{
 										try
 										{
-											if (username != owner)
+											if (username == "")
 											{
-												displayReplyMenu(1);
+												cout << "0 to exit:" << endl << endl;
+												cin >> choice;
+												cout << endl;
 											}
 											else
 											{
-												displayReplyMenu(0);
-											}
-											cin >> choice;
-											cout << endl;
-											if (choice == "0")
-											{
-												break;
-											}
-											else if (choice == "1") //Reply
-											{
-												replyPost(fileName, username, postList);
-												break;
+												if (username != owner)
+												{
+													displayReplyMenu(1);
+												}
+												else
+												{
+													displayReplyMenu(0);
+												}
+												cin >> choice;
+												cout << endl;
+												if (choice == "0")
+												{
+													break;
+												}
+												else if (choice == "1") //Reply
+												{
+													replyPost(fileName, username, postList);
+													break;
 
-											}
-											else if (choice == "2") //Edit Reply
-											{
-												editReply(fileName, username, postList);
-												break;
-											}
-											else if (choice == "3") //Delete Reply
-											{
-												deleteReply(fileName, username, postList);
-												break;
-											}
-											else if (choice == "4" && username == owner) //Edit post
-											{
-												string newFileName = editPost(fileName, username, postList, topicContentList);
+												}
+												else if (choice == "2") //Edit Reply
+												{
+													editReply(fileName, username, postList);
+													break;
+												}
+												else if (choice == "3") //Delete Reply
+												{
+													deleteReply(fileName, username, postList);
+													break;
+												}
+												else if (choice == "4" && username == owner) //Edit post
+												{
+													string newFileName = editPost(fileName, username, postList, topicContentList);
 
-												break;
+													break;
+												}
+												else if (choice == "5" && username == owner) //Delete post
+												{
+													int status = deletePost(fileName);
+													fileName = " ";
+													break;
+												}
+												else
+												{
+													cout << "Give a proper input" << endl;
+												}
 											}
-											else if (choice == "5" && username == owner) //Delete post
-											{
-												int status = deletePost(fileName);
-												fileName = " ";
-												break;
-											}
-											else
-											{
-												cout << "Give a proper input" << endl;
-											}
+											
 										}
 										catch (exception)
 										{
@@ -789,10 +799,122 @@ int main(){
 				}
 				else if (input == "1") //View Topics
 				{
-					//alltopic = loadtopic();
-					////cout << alltopic[0].getTopicText() << endl;
-					//displaytopics(alltopic);
-					displayTopics();
+					while (true)
+					{
+						try {
+							topicList = displayTopics();
+							string listChoice = "";
+							cout << "Topic to visit(0 to exit): ";
+							cin >> listChoice;
+							cout << endl;
+							if (listChoice == "0")
+							{
+								break;
+							}
+							while (true)
+							{
+								string choice;
+								string topic = topicList.get(stoi(listChoice) - 1);
+								topicContentList = topicContent(topic);
+								cout << "Post to visit(0 to exit): ";
+								cin >> choice;
+								cout << endl;
+								if (choice == "0")
+								{
+									break;
+								}
+								else
+								{
+									string post = topicContentList.get(stoi(choice) - 1);
+									string fileName = topic + "`" + post;
+									postList = postContent(fileName);
+									string* array = split(fileName, '`');
+									string owner = array[2];
+									cout << endl;
+									while (true)
+									{
+										try
+										{
+											if (username == "")
+											{
+												cout << "0 to exit:";
+												cin >> choice;
+												cout << endl<<endl;
+												if (choice == "0")
+												{
+													break;
+												}
+											}
+											else
+											{
+												if (username != owner)
+												{
+													displayReplyMenu(1);
+												}
+												else
+												{
+													displayReplyMenu(0);
+												}
+												cin >> choice;
+												cout << endl;
+												if (choice == "0")
+												{
+													break;
+												}
+												else if (choice == "1") //Reply
+												{
+													replyPost(fileName, username, postList);
+													break;
+
+												}
+												else if (choice == "2") //Edit Reply
+												{
+													editReply(fileName, username, postList);
+													break;
+												}
+												else if (choice == "3") //Delete Reply
+												{
+													deleteReply(fileName, username, postList);
+													break;
+												}
+												else if (choice == "4" && username == owner) //Edit post
+												{
+													string newFileName = editPost(fileName, username, postList, topicContentList);
+
+													break;
+												}
+												else if (choice == "5" && username == owner) //Delete post
+												{
+													int status = deletePost(fileName);
+													fileName = " ";
+													break;
+												}
+												else
+												{
+													cout << "Give a proper input" << endl;
+												}
+											}
+
+										}
+										catch (exception)
+										{
+											cout << "Give a proper input" << endl << endl;
+										}
+									}
+
+
+								}
+							}
+
+						}
+
+						catch (exception)
+						{
+							cout << "Give a proper input" << endl << endl;
+						}
+
+
+					}
 
 				}
 				else if (input == "2")//Register
