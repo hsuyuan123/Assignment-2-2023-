@@ -223,7 +223,8 @@ string loginuser() {
 
 List displayTopics()
 {
-	int id=1;
+	displaySticky();
+	//int id=sizeof(displaySticky);
 	List topicList;
 	string name;
 	string line;
@@ -482,34 +483,40 @@ void stickypost(string fileName, List postList) {
 	string content;
 	ofstream myfile2;
 	myfile2.open("sticky.txt", ios::app);
-	cout << "Choosing: ";
-	cin.ignore();
-	getline(cin, postnum);
-	if (postnum != "0")
-	{
-		cout << endl;
-		;
-		myfile2 << postname;
-		cout << "Post stickied" << endl << endl;
-		myfile2.close();
-	}
-
+	cin >> postnum;
+	//search for post name 
+	string combined = postname;
+	myfile2 << combined;
+	cout << "Post stickied.";
+	myfile2.close();
 }
 
-void displaySticky() {
+List displaySticky() {
+	int id = 1;
+	List stickyList;
+	string name;
+	string line;
 	ifstream myfile;
 	ofstream myfile2;
 	myfile.open("sticky.txt");
-	while (getline(myfile, line))
+	if (!myfile)
 	{
-		stickylist = array[1];
-		stickylist.add(line);
+		cout << "Error" << endl;
 	}
-	for (string i : stickylist) {
-		postList.Get(postname);
+	else
+	{
+		while (getline(myfile, line))
+		{
+			name = line;
+			cout << id << ". " + name << endl;
+			stickyList.add(name);
+			id++;
+		}
+		myfile.close();
 	}
-
+	return stickyList;
 }
+
 
 string editPost(string fileName, string username, List postList,List topicContentList)
 {
@@ -672,7 +679,7 @@ int main(){
 	//Initiate topics into a list
 	//string line;
 	//ifstream myfile;
-	while (true){
+	while (true) {
 		try
 		{
 			string input = "Hello";
@@ -693,7 +700,7 @@ int main(){
 						try {
 							displaySticky();
 							topicList = displayTopics();
-							string listChoice="";
+							string listChoice = "";
 							cout << "Topic to visit(0 to exit): ";
 							cin >> listChoice;
 							cout << endl;
@@ -767,152 +774,6 @@ int main(){
 												{
 													string newFileName = editPost(fileName, username, postList, topicContentList);
 
-												break;
-											}
-											else if (choice == "5" && username == owner) //Delete post
-											{
-												int status = deletePost(fileName);
-												fileName = " ";
-												break;
-											}
-											else if (choice == "6" && username == owner) {
-												stickypost(fileName, postList);
-											}
-											else
-											{
-												cout << "Give a proper input" << endl;
-											}
-										}
-										catch (exception)
-										{
-											cout << "Give a proper input" << endl << endl;
-										}
-									}
-
-
-								}
-							}
-
-							}
-						
-						catch (exception)
-						{
-							cout << "Give a proper input" << endl << endl;
-						}
-						
-						
-					}
-
-
-				}
-				else if (input == "2") // Topics you visited
-				{
-					//Put new things here
-				}
-				else if (input == "3") //Logout
-				{
-					string username = "";
-					cout << "You have logged out. ";
-				}
-				else
-				{
-					cout << "Give a proper input" << endl;
-				}
-			}
-			else //Not logged in
-			{
-				displayMenuNoLogin();
-				cin >> input;
-				cout << " " << endl;
-				if (input == "0") //Exit
-				{
-					cout << "Goodbye!" << endl;
-					break;
-				}
-				else if (input == "1") //View Topics
-				{
-					while (true)
-					{
-						try {
-							topicList = displayTopics();
-							string listChoice = "";
-							cout << "Topic to visit(0 to exit): ";
-							cin >> listChoice;
-							cout << endl;
-							if (listChoice == "0")
-							{
-								break;
-							}
-							while (true)
-							{
-								string choice;
-								string topic = topicList.get(stoi(listChoice) - 1);
-								topicContentList = topicContent(topic);
-								cout << "Post to visit(0 to exit): ";
-								cin >> choice;
-								cout << endl;
-								if (choice == "0")
-								{
-									break;
-								}
-								else
-								{
-									string post = topicContentList.get(stoi(choice) - 1);
-									string fileName = topic + "`" + post;
-									postList = postContent(fileName);
-									string* array = split(fileName, '`');
-									string owner = array[2];
-									cout << endl;
-									while (true)
-									{
-										try
-										{
-											if (username == "")
-											{
-												cout << "0 to exit:";
-												cin >> choice;
-												cout << endl<<endl;
-												if (choice == "0")
-												{
-													break;
-												}
-											}
-											else
-											{
-												if (username != owner)
-												{
-													displayReplyMenu(1);
-												}
-												else
-												{
-													displayReplyMenu(0);
-												}
-												cin >> choice;
-												cout << endl;
-												if (choice == "0")
-												{
-													break;
-												}
-												else if (choice == "1") //Reply
-												{
-													replyPost(fileName, username, postList);
-													break;
-
-												}
-												else if (choice == "2") //Edit Reply
-												{
-													editReply(fileName, username, postList);
-													break;
-												}
-												else if (choice == "3") //Delete Reply
-												{
-													deleteReply(fileName, username, postList);
-													break;
-												}
-												else if (choice == "4" && username == owner) //Edit post
-												{
-													string newFileName = editPost(fileName, username, postList, topicContentList);
-
 													break;
 												}
 												else if (choice == "5" && username == owner) //Delete post
@@ -921,12 +782,16 @@ int main(){
 													fileName = " ";
 													break;
 												}
+												else if (choice == "6" && username == owner)
+												{
+													stickypost(fileName, postList);
+													break;
+												}
 												else
 												{
 													cout << "Give a proper input" << endl;
 												}
 											}
-
 										}
 										catch (exception)
 										{
@@ -936,41 +801,182 @@ int main(){
 
 
 								}
-							}
 
+							}
 						}
 
 						catch (exception)
 						{
 							cout << "Give a proper input" << endl << endl;
 						}
-
-
 					}
 
 				}
-				else if (input == "2")//Register
-				{
-					registeruser();
-					cout << endl;
+					else if (input == "2") // Topics you visited
+					{
+						//Put new things here
+					}
+					else if (input == "3") //Logout
+					{
+						string username = "";
+						cout << "You have logged out. ";
+					}
+					else
+					{
+						cout << "Give a proper input" << endl;
+					}
 				}
-				else if (input == "3") //Login
+				else //Not logged in
 				{
-					username = loginuser();
-					cout << endl;
+					displayMenuNoLogin();
+					cin >> input;
+					cout << " " << endl;
+					if (input == "0") //Exit
+					{
+						cout << "Goodbye!" << endl;
+						break;
+					}
+					else if (input == "1") //View Topics
+					{
+						while (true)
+						{
+							try {
+								topicList = displayTopics();
+								string listChoice = "";
+								cout << "Topic to visit(0 to exit): ";
+								cin >> listChoice;
+								cout << endl;
+								if (listChoice == "0")
+								{
+									break;
+								}
+								while (true)
+								{
+									string choice;
+									string topic = topicList.get(stoi(listChoice) - 1);
+									topicContentList = topicContent(topic);
+									cout << "Post to visit(0 to exit): ";
+									cin >> choice;
+									cout << endl;
+									if (choice == "0")
+									{
+										break;
+									}
+									else
+									{
+										string post = topicContentList.get(stoi(choice) - 1);
+										string fileName = topic + "`" + post;
+										postList = postContent(fileName);
+										string* array = split(fileName, '`');
+										string owner = array[2];
+										cout << endl;
+										while (true)
+										{
+											try
+											{
+												if (username == "")
+												{
+													cout << "0 to exit:";
+													cin >> choice;
+													cout << endl << endl;
+													if (choice == "0")
+													{
+														break;
+													}
+												}
+												else
+												{
+													if (username != owner)
+													{
+														displayReplyMenu(1);
+													}
+													else
+													{
+														displayReplyMenu(0);
+													}
+													cin >> choice;
+													cout << endl;
+													if (choice == "0")
+													{
+														break;
+													}
+													else if (choice == "1") //Reply
+													{
+														replyPost(fileName, username, postList);
+														break;
+
+													}
+													else if (choice == "2") //Edit Reply
+													{
+														editReply(fileName, username, postList);
+														break;
+													}
+													else if (choice == "3") //Delete Reply
+													{
+														deleteReply(fileName, username, postList);
+														break;
+													}
+													else if (choice == "4" && username == owner) //Edit post
+													{
+														string newFileName = editPost(fileName, username, postList, topicContentList);
+
+														break;
+													}
+													else if (choice == "5" && username == owner) //Delete post
+													{
+														int status = deletePost(fileName);
+														fileName = " ";
+														break;
+													}
+													else
+													{
+														cout << "Give a proper input" << endl;
+													}
+												}
+
+											}
+											catch (exception)
+											{
+												cout << "Give a proper input" << endl << endl;
+											}
+										}
+
+
+									}
+								}
+
+							}
+
+							catch (exception)
+							{
+								cout << "Give a proper input" << endl << endl;
+							}
+
+
+						}
+
+					}
+					else if (input == "2")//Register
+					{
+						registeruser();
+						cout << endl;
+					}
+					else if (input == "3") //Login
+					{
+						username = loginuser();
+						cout << endl;
+					}
+					else
+					{
+						cout << "Give a proper input" << endl;
+					}
 				}
-				else
-				{
-					cout << "Give a proper input" << endl;
-				}
-			}
 		}
 		catch (exception)
 		{
-			cout << "Give a proper input" << endl<<endl;
+			cout << "Give a proper input" << endl << endl;
 		}
 	}
-	
 }
 
 
