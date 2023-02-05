@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <chrono>
+#include <ctime>
 #include "user.h"
 #include "List.h"
 //#include "topic.h"
@@ -51,7 +53,7 @@ void registeruser(){
 	{
 		while (getline(myfile, line))
 		{
-			string* array = split(line, ',');
+			string* array = split(line, '`');
 			if (username == array[0])
 			{
 				available = false;
@@ -65,7 +67,11 @@ void registeruser(){
 			cout << "Username available. " << endl;
 			cout << "Input password: ";
 			cin >> password;
-			string combined= username + "," + password + "\n";
+			
+			cout << "User bio(Optional): " << endl;
+			string bio;
+			cin >> bio;
+			string combined = username + "`" + password +"`"+bio + "\n";
 			myfile2 << combined;
 			cout << "Account created"<<endl;
 			myfile2.close();
@@ -97,7 +103,7 @@ string loginuser() {
 	{
 		while (getline(myfile, line))
 		{
-			string* array=split(line,',');
+			string* array=split(line,'`');
 			if (array[0] == username)
 			{
 				valid = true;
@@ -263,13 +269,13 @@ List topicContent(string fileName)
 		ofstream myfile2(fileName + ".txt");
 		myfile2.close();
 	}
-	cout << fileName << endl << "------------------------------------" << endl;
+	cout << fileName << endl << "---------------------------------------------------------------------------------" << endl;
 	while (getline(myfile, line))
 	{
 		string* array = split(line, '`');
 		name = array[1];
 		content = array[0];
-		cout << counter + 1 << ". " << content << ", by " << name << endl;
+		cout << counter + 1 << ". " << content << ", by " << name<<"\t""\t""\t""\t" "\t" <<"Opened at "<<array[2]<<" "<<array[3] << endl;
 		counter++;
 		topicContent.add(line);
 	}
@@ -294,21 +300,24 @@ List postContent(string fileName)
 		ofstream myfile2(fileName + ".txt");
 		myfile2.close();
 	}
-
+	cout << fileName;
 	string* array = split(fileName, '`');
 	name = array[1];
 	username = array[2];
 
 	
-	cout << name << endl << "------------------------------------" << endl;
+	cout << name << endl << "------------------------------------------------------------------------------------" << endl;
+
 	while (getline(myfile, line))
 	{
-		
 		string* array = split(line, '`');
 		name = array[1];
 		content = array[2];
-		string combined = to_string(counter + 1) + "`" + name + "`" + content + "\n";
-		cout << counter + 1 << ". " + name << ": " << content << endl;
+		string date = array[3];
+		string time = array[4];
+		string combined = to_string(counter + 1) + "`" + name + "`" + content + "`" +date + "`"+time + "\n";
+		cout << to_string(counter + 1) << ". " << name << ": " << content << "\t\t\t\t\t\t" << date << " " << time << endl;
+		
 		postList.add(combined);
 			
 		
@@ -319,10 +328,105 @@ List postContent(string fileName)
 	return postList;
 }
 
+void createTopic(string fileName)
+{
+	string line;
+	ifstream myfile;
+	string name;
+	string content;
+	List topicContent;
+	int counter = 0;
+	myfile.open(fileName + ".txt");
+	if (!myfile)
+	{
+		ofstream myfile2(fileName + ".txt");
+		myfile2.close();
+	}
+	myfile.close();
+	string topicName;
+	cout << "Topic Name(0 to exit): ";
+	cin.ignore();
+	getline(cin, topicName);
+	if (topicName != "0")
+	{
+		myfile.open(fileName + ".txt");
+		while (getline(myfile, line))
+		{
+			string* array = split(line, '`');
+			if (topicName == array[0])
+			{
+				cout << "Topic already exists!" << endl;
+				return;
+			}
+		}
+		cout << endl;
+		ofstream myfile2;
+		
+		myfile2.open(fileName + ".txt", ios::app);
+		
+		myfile2 << topicName+"\n";
+		cout << "Topic created" << endl;
+		myfile2.close();
+	}
+
+}
+
+void createPost(string fileName,string username)
+{
+	string line;
+	ifstream myfile;
+	string name;
+	string content;
+	List topicContent;
+	int counter = 0;
+	myfile.open(fileName + ".txt");
+	if (!myfile)
+	{
+		ofstream myfile2(fileName + ".txt");
+		myfile2.close();
+	}
+	myfile.close();
+	string postName;
+	cout << "Topic Name(0 to exit): ";
+	cin.ignore();
+	getline(cin, postName);
+	if (postName != "0")
+	{
+		myfile.open(fileName + ".txt");
+		while (getline(myfile, line))
+		{
+			string* array = split(line, '`');
+			if (postName == array[1])
+			{
+				cout << "Post already exists!" << endl;
+				return;
+			}
+		}
+		cout << endl;
+		ofstream myfile2;
+		time_t raw_time;
+		time(&raw_time);
+
+		// Convert to tm (struct tm)
+		tm time_info;
+		localtime_s(&time_info, &raw_time);
+		string date = to_string(time_info.tm_mday) + "/" + to_string(time_info.tm_mon + 1) + "/" + to_string(time_info.tm_year + 1900);
+		string time = to_string(time_info.tm_hour) + ":" + to_string(time_info.tm_min) + ":" + to_string(time_info.tm_sec);
+		myfile2.open(fileName + ".txt", ios::app);
+		string combined = postName + "`" + username + "`" + date + "`" + time+"\n";
+		myfile2 << combined;
+		cout << "Post created" << endl;
+		myfile2.close();
+	}
+	
+}
+
 void replyPost(string fileName,string username,List postList)
 {
 	string line;
 	ifstream myfile;
+	
+	
 	string name;
 	string content;
 	myfile.open(fileName + ".txt");
@@ -340,7 +444,15 @@ void replyPost(string fileName,string username,List postList)
 	if (reply != "0")
 	{
 		cout << endl;
-		string combined = to_string(postList.getLength() + 1) + "`" + username + "`" + reply + "\n";
+		time_t raw_time;
+		time(&raw_time);
+
+		// Convert to tm (struct tm)
+		tm time_info;
+		localtime_s(&time_info, &raw_time);
+		string date = to_string(time_info.tm_mday) + "/" + to_string(time_info.tm_mon + 1)+"/" + to_string(time_info.tm_year + 1900);
+		string time = to_string(time_info.tm_hour) + ":" + to_string(time_info.tm_min) + ":" + to_string(time_info.tm_sec);
+		string combined = to_string(postList.getLength() + 1) + "`" + username + "`" + reply +"`"+date+"`"+time+ "\n";
 		myfile2 << combined;
 		cout << "Reply sent" << endl << endl;
 		myfile2.close();
@@ -376,7 +488,7 @@ void editReply(string fileName, string username, List postList)
 		getline(cin, editedReply);
 		cout << endl;
 		postList.remove(stoi(choice)-1);
-		string combined= array[0] + "`"  + username + "`" +editedReply+"\n";
+		string combined= array[0] + "`"  + username + "`" +editedReply+"`"+array[2]+"`"+array[3]+"\n";
 		if (stoi(choice) == postList.getLength()+1)
 		{
 			postList.add(combined);
@@ -605,7 +717,30 @@ string editPost(string fileName, string username, List postList,List topicConten
 	return fileName;
 }
 
-
+void displayProfile(string username)
+{
+	ifstream myfile;
+	string line;
+	myfile.open( "users.txt");
+	while (getline(myfile, line))
+	{
+		string* array = split(line, '`');
+		if (array[0] == username)
+		{
+			if (array[2] == "")
+			{
+				cout << "You have no bio" << endl;
+			}
+			else
+			{
+				cout << array[2] << endl;
+			}
+			
+			break;
+		}
+	}
+	
+}
 
 void init()// Make sure files exist so there is no error
 {
@@ -638,8 +773,9 @@ void displayMenuNoLogin() //When not logged in
 void displayMenuLogin() //When logged in
 {
 	cout << "1. View Topics" << endl;
-	cout << "2. Topics you visited" << endl;
-	cout << "3. Logout" << endl;
+	cout << "2. Create Topic" << endl;
+	cout << "3. User Profile" << endl;
+	cout << "4. Logout" << endl;
 	cout << "0. Exit" << endl;
 	cout << "What would you like to do: ";
 }
@@ -669,17 +805,28 @@ void displayReplyMenu(int i)
 }
 
 int main(){
-	/*Topic* alltopic;*/
+	//time_t raw_time;
+	//time(&raw_time);
+
+	//// Convert to tm (struct tm)
+	//tm time_info;
+	//localtime_s(&time_info, &raw_time);
+
+	//// Output date and time
+	//std::cout << "Year: " << time_info.tm_year + 1900 << std::endl;
+	//std::cout << "Month: " << time_info.tm_mon + 1 << std::endl;
+	//std::cout << "Day: " << time_info.tm_mday << std::endl;
+	//std::cout << "Time: " << time_info.tm_hour << ":" << time_info.tm_min << ":" << time_info.tm_sec << std::endl;
+	//string date = to_string(time_info.tm_mday) + "/" + to_string(time_info.tm_mon + 1) + to_string(time_info.tm_year + 1900);
+	//string time = to_string(time_info.tm_hour) + ":" + to_string(time_info.tm_min) + ":" + to_string(time_info.tm_sec);
 	init();
 	string username="";
-	//Topic topicList;
+
 	List topicList;
 	List topicContentList;
 	List postList;
-	//Initiate topics into a list
-	//string line;
-	//ifstream myfile;
-	while (true) {
+
+	while (true){
 		try
 		{
 			string input = "Hello";
@@ -699,6 +846,154 @@ int main(){
 					{
 						try {
 							displaySticky();
+							topicList = displayTopics();
+							string listChoice = "";
+							cout << "Topic to visit(0 to exit): ";
+							cin >> listChoice;
+							cout << endl;
+							if (listChoice == "0")
+							{
+								break;
+
+							}
+							while (true)
+							{
+								
+									string choice;
+									string topic = topicList.get(stoi(listChoice) - 1);
+									topicContentList = topicContent(topic);
+									cout << "Type 'create' to create post" << endl << "Post to visit(0 to exit) : ";
+									cin >> choice;
+									cout << endl;
+									if (choice == "0")
+									{
+										break;
+									}
+									else if (choice == "create")
+									{
+										createPost(topic, username);
+									}
+									else
+									{
+										string post = topicContentList.get(stoi(choice) - 1);
+										string* array = split(post, '`');
+
+										string fileName = topic + "`" + array[0] + "`" + array[1];
+										postList = postContent(fileName);
+										array = split(fileName, '`');
+										string owner = array[2];
+										cout << endl;
+										while (true)
+										{
+											try
+											{
+												if (username == "")
+												{
+													cout << "0 to exit:" << endl << endl;
+													cin >> choice;
+													cout << endl;
+												}
+												else
+												{
+													if (username != owner)
+													{
+														displayReplyMenu(1);
+													}
+													else
+													{
+														displayReplyMenu(0);
+													}
+													cin >> choice;
+													cout << endl;
+													if (choice == "0")
+													{
+														break;
+													}
+													else if (choice == "1") //Reply
+													{
+														replyPost(fileName, username, postList);
+														break;
+
+													}
+													else if (choice == "2") //Edit Reply
+													{
+														editReply(fileName, username, postList);
+														break;
+													}
+													else if (choice == "3") //Delete Reply
+													{
+														deleteReply(fileName, username, postList);
+														break;
+													}
+													else if (choice == "4" && username == owner) //Edit post
+													{
+														string newFileName = editPost(fileName, username, postList, topicContentList);
+
+													break;
+												}
+												else if (choice == "5" && username == owner) //Delete post
+												{
+													int status = deletePost(fileName);
+													fileName = " ";
+													break;
+												}
+												else
+												{
+													cout << "Give a proper input" << endl;
+												}
+											}
+											
+										}
+										catch (exception)
+										{
+											cout << "Give a proper input" << endl << endl;
+										}
+									}
+
+
+								}
+							}
+
+							}
+						
+						catch (exception)
+						{
+							cout << "Give a proper input" << endl << endl;
+						}
+						
+						
+					}
+
+				}
+				else if (input == "2") // Topics you visited
+				{
+					//Put new things here
+				}
+				else if (input == "3") //Logout
+				{
+					string username = "";
+					cout << "You have logged out. ";
+				}
+				else
+				{
+					cout << "Give a proper input" << endl;
+				}
+			}
+			else //Not logged in
+			{
+				displayMenuNoLogin();
+				cin >> input;
+				cout << " " << endl;
+				if (input == "0") //Exit
+				{
+					cout << "Goodbye!" << endl;
+					break;
+				}
+				else if (input == "1") //View Topics
+				{
+					while (true)
+					{
+						try {
 							topicList = displayTopics();
 							string listChoice = "";
 							cout << "Topic to visit(0 to exit): ";
@@ -734,9 +1029,13 @@ int main(){
 										{
 											if (username == "")
 											{
-												cout << "0 to exit:" << endl << endl;
+												cout << "0 to exit:";
 												cin >> choice;
-												cout << endl;
+												cout << endl<<endl;
+												if (choice == "0")
+												{
+													break;
+												}
 											}
 											else
 											{
@@ -782,16 +1081,12 @@ int main(){
 													fileName = " ";
 													break;
 												}
-												else if (choice == "6" && username == owner)
-												{
-													stickypost(fileName, postList);
-													break;
-												}
 												else
 												{
 													cout << "Give a proper input" << endl;
 												}
 											}
+
 										}
 										catch (exception)
 										{
@@ -801,182 +1096,44 @@ int main(){
 
 
 								}
-
 							}
+
 						}
 
 						catch (exception)
 						{
 							cout << "Give a proper input" << endl << endl;
 						}
+
+
 					}
 
 				}
-					else if (input == "2") // Topics you visited
-					{
-						//Put new things here
-					}
-					else if (input == "3") //Logout
-					{
-						string username = "";
-						cout << "You have logged out. ";
-					}
-					else
-					{
-						cout << "Give a proper input" << endl;
-					}
-				}
-				else //Not logged in
+				else if (input == "2")//Register
 				{
-					displayMenuNoLogin();
-					cin >> input;
-					cout << " " << endl;
-					if (input == "0") //Exit
-					{
-						cout << "Goodbye!" << endl;
-						break;
-					}
-					else if (input == "1") //View Topics
-					{
-						while (true)
-						{
-							try {
-								topicList = displayTopics();
-								string listChoice = "";
-								cout << "Topic to visit(0 to exit): ";
-								cin >> listChoice;
-								cout << endl;
-								if (listChoice == "0")
-								{
-									break;
-								}
-								while (true)
-								{
-									string choice;
-									string topic = topicList.get(stoi(listChoice) - 1);
-									topicContentList = topicContent(topic);
-									cout << "Post to visit(0 to exit): ";
-									cin >> choice;
-									cout << endl;
-									if (choice == "0")
-									{
-										break;
-									}
-									else
-									{
-										string post = topicContentList.get(stoi(choice) - 1);
-										string fileName = topic + "`" + post;
-										postList = postContent(fileName);
-										string* array = split(fileName, '`');
-										string owner = array[2];
-										cout << endl;
-										while (true)
-										{
-											try
-											{
-												if (username == "")
-												{
-													cout << "0 to exit:";
-													cin >> choice;
-													cout << endl << endl;
-													if (choice == "0")
-													{
-														break;
-													}
-												}
-												else
-												{
-													if (username != owner)
-													{
-														displayReplyMenu(1);
-													}
-													else
-													{
-														displayReplyMenu(0);
-													}
-													cin >> choice;
-													cout << endl;
-													if (choice == "0")
-													{
-														break;
-													}
-													else if (choice == "1") //Reply
-													{
-														replyPost(fileName, username, postList);
-														break;
-
-													}
-													else if (choice == "2") //Edit Reply
-													{
-														editReply(fileName, username, postList);
-														break;
-													}
-													else if (choice == "3") //Delete Reply
-													{
-														deleteReply(fileName, username, postList);
-														break;
-													}
-													else if (choice == "4" && username == owner) //Edit post
-													{
-														string newFileName = editPost(fileName, username, postList, topicContentList);
-
-														break;
-													}
-													else if (choice == "5" && username == owner) //Delete post
-													{
-														int status = deletePost(fileName);
-														fileName = " ";
-														break;
-													}
-													else
-													{
-														cout << "Give a proper input" << endl;
-													}
-												}
-
-											}
-											catch (exception)
-											{
-												cout << "Give a proper input" << endl << endl;
-											}
-										}
-
-
-									}
-								}
-
-							}
-
-							catch (exception)
-							{
-								cout << "Give a proper input" << endl << endl;
-							}
-
-
-						}
-
-					}
-					else if (input == "2")//Register
-					{
-						registeruser();
-						cout << endl;
-					}
-					else if (input == "3") //Login
-					{
-						username = loginuser();
-						cout << endl;
-					}
-					else
-					{
-						cout << "Give a proper input" << endl;
-					}
+					registeruser();
+					cout << endl;
 				}
+				else if (input == "3") //Login
+				{
+					username = loginuser();
+					cout << endl;
+				}
+				else
+				{
+					cout << "Give a proper input" << endl;
+				}
+			}
 		}
 		catch (exception)
 		{
 			cout << "Give a proper input" << endl << endl;
 		}
 	}
+		
+		
+		
+	
 }
 
 
