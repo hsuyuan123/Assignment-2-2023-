@@ -150,6 +150,7 @@
     <ClCompile Include="user.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="sticky.txt" />
     <Text Include="topic.txt" />
     <Text Include="users.txt" />
   </ItemGroup>

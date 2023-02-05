@@ -403,11 +403,7 @@ void editReply(string fileName, string username, List postList)
 	else //Not author
 	{
 		cout << "You are not the author of this reply." << endl;
-	}
-
-	
-	
-	
+	}	
 }
 
 void deleteReply(string fileName, string username, List postList)
@@ -458,11 +454,6 @@ void deleteReply(string fileName, string username, List postList)
 			cout << "You are not the author of this reply." << endl;
 		}
 	}
-	
-
-
-
-
 }
 
 int deletePost(string fileName)
@@ -480,6 +471,44 @@ int deletePost(string fileName)
 		cout << "Error occurred!" << endl;*/
 	delete[] char_array;
 	return status;
+}
+
+void stickypost(string fileName, List postList) {
+	cout << "Choose which post to stick" << endl;
+	string postnum;
+	string postname;
+	string line;
+	ifstream myfile;
+	string content;
+	ofstream myfile2;
+	myfile2.open("sticky.txt", ios::app);
+	cout << "Choosing: ";
+	cin.ignore();
+	getline(cin, postnum);
+	if (postnum != "0")
+	{
+		cout << endl;
+		;
+		myfile2 << postname;
+		cout << "Post stickied" << endl << endl;
+		myfile2.close();
+	}
+
+}
+
+void displaySticky() {
+	ifstream myfile;
+	ofstream myfile2;
+	myfile.open("sticky.txt");
+	while (getline(myfile, line))
+	{
+		stickylist = array[1];
+		stickylist.add(line);
+	}
+	for (string i : stickylist) {
+		postList.Get(postname);
+	}
+
 }
 
 string editPost(string fileName, string username, List postList,List topicContentList)
@@ -625,6 +654,7 @@ void displayReplyMenu(int i)
 		cout << "3. Delete reply" << endl;
 		cout << "4. Edit post" << endl;
 		cout << "5. Delete post" << endl;
+		cout << "6.Stick Post" << endl;
 		cout << "0. Exit" << endl;
 		cout << "What would you like to do: ";
 	}
@@ -661,6 +691,7 @@ int main(){
 					while (true)
 					{
 						try {
+							displaySticky();
 							topicList = displayTopics();
 							string listChoice="";
 							cout << "Topic to visit(0 to exit): ";
@@ -735,6 +766,9 @@ int main(){
 												int status = deletePost(fileName);
 												fileName = " ";
 												break;
+											}
+											else if (choice == "6" && username == owner) {
+												stickypost(fileName, postList);
 											}
 											else
 											{
@@ -816,9 +850,6 @@ int main(){
 			cout << "Give a proper input" << endl<<endl;
 		}
 	}
-		
-		
-		
 	
 }
 
